@@ -16,7 +16,7 @@ create_generated_clock -name clk_150mhz [get_pins system_top_wrapper_1/system_to
 
 create_generated_clock -name clk_spdif [get_pins system_top_wrapper_1/system_top_i/Zynq_1/clk_wiz_0/U0/mmcm_adv_inst/CLKOUT0]
 
-create_generated_clock -name clk_ref_hdmi [get_pins system_top_wrapper_1/system_top_i/Video_Display/axi_clkgen_0/inst/USER_LOGIC_I/i_clkgen/i_mmcm/CLKOUT0]
+create_generated_clock -name clk_ref_hdmi [get_pins system_top_wrapper_1/system_top_i/Video_Display/axi_clkgen_0/U0/USER_LOGIC_I/i_clkgen/i_mmcm/CLKOUT0]
 
 ################
 # Clock Groups #
