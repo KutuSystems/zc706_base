@@ -133,11 +133,10 @@ proc create_hier_cell_Zynq_1 { parentCell nameHier } {
   create_bd_intf_pin -mode Slave -vlnv xilinx.com:interface:aximm_rtl:1.0 S01_AXI
 
   # Create pins
-  create_bd_pin -dir I FOS_int
-  create_bd_pin -dir O clk_150mhz
-  create_bd_pin -dir O clk_75mhz
+  create_bd_pin -dir O clk_100mhz
+  create_bd_pin -dir O clk_200mhz
   create_bd_pin -dir I hdmi_int
-  create_bd_pin -dir O -from 0 -to 0 interconnect_aresetn
+  create_bd_pin -dir O -from 0 -to 0 peripheral_aresetn
   create_bd_pin -dir O spdif_tx_o
 
   # Create instance: axi4_gp0, and set properties
@@ -153,22 +152,22 @@ proc create_hier_cell_Zynq_1 { parentCell nameHier } {
 
   # Create instance: clk_wiz_0, and set properties
   set clk_wiz_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:clk_wiz:5.1 clk_wiz_0 ]
-  set_property -dict [ list CONFIG.CLKOUT1_REQUESTED_OUT_FREQ {12.288} CONFIG.PRIM_IN_FREQ {75.000} CONFIG.RESET_BOARD_INTERFACE {Custom} CONFIG.USE_BOARD_FLOW {false}  ] $clk_wiz_0
-
-  # Create instance: clk_wiz_1, and set properties
-  set clk_wiz_1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:clk_wiz:5.1 clk_wiz_1 ]
-  set_property -dict [ list CONFIG.CLKOUT1_REQUESTED_OUT_FREQ {75.000} CONFIG.CLKOUT2_REQUESTED_OUT_FREQ {150.000} CONFIG.CLKOUT2_USED {true} CONFIG.PRIM_SOURCE {No_buffer} CONFIG.USE_INCLK_SWITCHOVER {false} CONFIG.USE_RESET {false}  ] $clk_wiz_1
+  set_property -dict [ list CONFIG.CLKOUT1_REQUESTED_OUT_FREQ {12.288} CONFIG.PRIM_SOURCE {No_buffer} CONFIG.RESET_BOARD_INTERFACE {Custom} CONFIG.USE_BOARD_FLOW {false} CONFIG.USE_DYN_PHASE_SHIFT {false} CONFIG.USE_PHASE_ALIGNMENT {true} CONFIG.USE_SPREAD_SPECTRUM {false}  ] $clk_wiz_0
 
   # Create instance: proc_sys_reset_1, and set properties
   set proc_sys_reset_1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset:5.0 proc_sys_reset_1 ]
 
   # Create instance: processing_system7_1, and set properties
   set processing_system7_1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:processing_system7:5.3 processing_system7_1 ]
-  set_property -dict [ list CONFIG.PCW_CAN0_PERIPHERAL_ENABLE {0} CONFIG.PCW_ENET0_PERIPHERAL_FREQMHZ {100 Mbps} CONFIG.PCW_EN_CLK0_PORT {1} CONFIG.PCW_EN_CLKTRIG0_PORT {0} CONFIG.PCW_EN_EMIO_GPIO {0} CONFIG.PCW_EN_RST0_PORT {1} CONFIG.PCW_FPGA0_PERIPHERAL_FREQMHZ {50} CONFIG.PCW_GPIO_EMIO_GPIO_ENABLE {0} CONFIG.PCW_I2C1_PERIPHERAL_ENABLE {0} CONFIG.PCW_IRQ_F2P_INTR {1} CONFIG.PCW_QSPI_PERIPHERAL_FREQMHZ {200} CONFIG.PCW_USE_DMA0 {1} CONFIG.PCW_USE_FABRIC_INTERRUPT {1} CONFIG.PCW_USE_M_AXI_GP0 {1} CONFIG.PCW_USE_S_AXI_HP0 {1} CONFIG.PCW_USE_S_AXI_HP1 {0} CONFIG.PCW_USE_S_AXI_HP2 {0} CONFIG.preset {ZC706*}  ] $processing_system7_1
+  set_property -dict [ list CONFIG.PCW_CAN0_PERIPHERAL_ENABLE {0} CONFIG.PCW_ENET0_PERIPHERAL_FREQMHZ {100 Mbps} CONFIG.PCW_EN_CLK0_PORT {1} CONFIG.PCW_EN_CLK1_PORT {1} CONFIG.PCW_EN_CLK2_PORT {0} CONFIG.PCW_EN_CLK3_PORT {0} CONFIG.PCW_EN_CLKTRIG0_PORT {0} CONFIG.PCW_EN_EMIO_GPIO {0} CONFIG.PCW_EN_RST0_PORT {1} CONFIG.PCW_FPGA0_PERIPHERAL_FREQMHZ {100} CONFIG.PCW_FPGA1_PERIPHERAL_FREQMHZ {200} CONFIG.PCW_FPGA2_PERIPHERAL_FREQMHZ {200} CONFIG.PCW_GPIO_EMIO_GPIO_ENABLE {0} CONFIG.PCW_I2C0_PERIPHERAL_ENABLE {0} CONFIG.PCW_I2C1_PERIPHERAL_ENABLE {0} CONFIG.PCW_IRQ_F2P_INTR {1} CONFIG.PCW_QSPI_PERIPHERAL_FREQMHZ {200} CONFIG.PCW_SD0_GRP_POW_ENABLE {0} CONFIG.PCW_SDIO_PERIPHERAL_FREQMHZ {25} CONFIG.PCW_USE_DMA0 {1} CONFIG.PCW_USE_FABRIC_INTERRUPT {1} CONFIG.PCW_USE_M_AXI_GP0 {1} CONFIG.PCW_USE_S_AXI_HP0 {1} CONFIG.PCW_USE_S_AXI_HP1 {0} CONFIG.PCW_USE_S_AXI_HP2 {0} CONFIG.PCW_WDT_PERIPHERAL_ENABLE {0} CONFIG.preset {ZC706*}  ] $processing_system7_1
 
   # Create instance: xlconcat_0, and set properties
   set xlconcat_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:xlconcat:1.0 xlconcat_0 ]
   set_property -dict [ list CONFIG.IN0_WIDTH {1} CONFIG.NUM_PORTS {2}  ] $xlconcat_0
+
+  # Create instance: xlconstant_gnd_0, and set properties
+  set xlconstant_gnd_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:xlconstant:1.0 xlconstant_gnd_0 ]
+  set_property -dict [ list CONFIG.CONST_VAL {0}  ] $xlconstant_gnd_0
 
   # Create interface connections
   connect_bd_intf_net -intf_net axi4_gp0_M00_AXI [get_bd_intf_pins M00_AXI] [get_bd_intf_pins axi4_gp0/M00_AXI]
@@ -183,25 +182,24 @@ proc create_hier_cell_Zynq_1 { parentCell nameHier } {
   connect_bd_intf_net -intf_net s01_axi_1 [get_bd_intf_pins S01_AXI] [get_bd_intf_pins axi4_hp0/S01_AXI]
 
   # Create port connections
-  connect_bd_net -net FOS_int_1 [get_bd_pins FOS_int] [get_bd_pins xlconcat_0/In1]
   connect_bd_net -net axi_spdif_tx_0_DMA_REQ_DAREADY [get_bd_pins axi_spdif_tx_0/DMA_REQ_DAREADY] [get_bd_pins processing_system7_1/DMA0_DAREADY]
   connect_bd_net -net axi_spdif_tx_0_DMA_REQ_DRLAST [get_bd_pins axi_spdif_tx_0/DMA_REQ_DRLAST] [get_bd_pins processing_system7_1/DMA0_DRLAST]
   connect_bd_net -net axi_spdif_tx_0_DMA_REQ_DRTYPE [get_bd_pins axi_spdif_tx_0/DMA_REQ_DRTYPE] [get_bd_pins processing_system7_1/DMA0_DRTYPE]
   connect_bd_net -net axi_spdif_tx_0_DMA_REQ_DRVALID [get_bd_pins axi_spdif_tx_0/DMA_REQ_DRVALID] [get_bd_pins processing_system7_1/DMA0_DRVALID]
   connect_bd_net -net axi_spdif_tx_0_spdif_tx_o [get_bd_pins spdif_tx_o] [get_bd_pins axi_spdif_tx_0/spdif_tx_o]
-  connect_bd_net -net clk_150mhz [get_bd_pins clk_150mhz] [get_bd_pins axi4_hp0/ACLK] [get_bd_pins axi4_hp0/M00_ACLK] [get_bd_pins axi4_hp0/S00_ACLK] [get_bd_pins axi4_hp0/S01_ACLK] [get_bd_pins clk_wiz_1/clk_out2] [get_bd_pins processing_system7_1/S_AXI_HP0_ACLK]
-  connect_bd_net -net clk_75mhz [get_bd_pins clk_75mhz] [get_bd_pins axi4_gp0/ACLK] [get_bd_pins axi4_gp0/M00_ACLK] [get_bd_pins axi4_gp0/M01_ACLK] [get_bd_pins axi4_gp0/M02_ACLK] [get_bd_pins axi4_gp0/M03_ACLK] [get_bd_pins axi4_gp0/M04_ACLK] [get_bd_pins axi4_gp0/S00_ACLK] [get_bd_pins axi_spdif_tx_0/DMA_REQ_ACLK] [get_bd_pins axi_spdif_tx_0/S_AXI_ACLK] [get_bd_pins clk_wiz_0/clk_in1] [get_bd_pins clk_wiz_1/clk_out1] [get_bd_pins proc_sys_reset_1/slowest_sync_clk] [get_bd_pins processing_system7_1/DMA0_ACLK] [get_bd_pins processing_system7_1/M_AXI_GP0_ACLK]
   connect_bd_net -net clk_wiz_0_clk_out1 [get_bd_pins axi_spdif_tx_0/spdif_data_clk] [get_bd_pins clk_wiz_0/clk_out1]
-  connect_bd_net -net clk_wiz_1_locked [get_bd_pins clk_wiz_1/locked] [get_bd_pins proc_sys_reset_1/dcm_locked]
   connect_bd_net -net logicvc_int_1 [get_bd_pins hdmi_int] [get_bd_pins xlconcat_0/In0]
-  connect_bd_net -net proc_sys_reset_1_interconnect_aresetn [get_bd_pins interconnect_aresetn] [get_bd_pins axi4_gp0/ARESETN] [get_bd_pins axi4_gp0/M00_ARESETN] [get_bd_pins axi4_gp0/M01_ARESETN] [get_bd_pins axi4_gp0/M02_ARESETN] [get_bd_pins axi4_gp0/M03_ARESETN] [get_bd_pins axi4_gp0/M04_ARESETN] [get_bd_pins axi4_gp0/S00_ARESETN] [get_bd_pins axi4_hp0/ARESETN] [get_bd_pins axi4_hp0/M00_ARESETN] [get_bd_pins axi4_hp0/S00_ARESETN] [get_bd_pins axi4_hp0/S01_ARESETN] [get_bd_pins axi_spdif_tx_0/S_AXI_ARESETN] [get_bd_pins proc_sys_reset_1/interconnect_aresetn]
+  connect_bd_net -net proc_sys_reset_1_interconnect_aresetn [get_bd_pins axi4_gp0/ARESETN] [get_bd_pins axi4_gp0/M00_ARESETN] [get_bd_pins axi4_gp0/M01_ARESETN] [get_bd_pins axi4_gp0/M02_ARESETN] [get_bd_pins axi4_gp0/M03_ARESETN] [get_bd_pins axi4_gp0/M04_ARESETN] [get_bd_pins axi4_gp0/S00_ARESETN] [get_bd_pins axi4_hp0/ARESETN] [get_bd_pins axi4_hp0/M00_ARESETN] [get_bd_pins axi4_hp0/S00_ARESETN] [get_bd_pins axi4_hp0/S01_ARESETN] [get_bd_pins axi_spdif_tx_0/S_AXI_ARESETN] [get_bd_pins proc_sys_reset_1/interconnect_aresetn]
+  connect_bd_net -net proc_sys_reset_1_peripheral_aresetn [get_bd_pins peripheral_aresetn] [get_bd_pins proc_sys_reset_1/peripheral_aresetn]
   connect_bd_net -net proc_sys_reset_1_peripheral_reset [get_bd_pins axi_spdif_tx_0/DMA_REQ_RSTN] [get_bd_pins clk_wiz_0/reset] [get_bd_pins proc_sys_reset_1/peripheral_reset]
   connect_bd_net -net processing_system7_1_DMA0_DATYPE [get_bd_pins axi_spdif_tx_0/DMA_REQ_DATYPE] [get_bd_pins processing_system7_1/DMA0_DATYPE]
   connect_bd_net -net processing_system7_1_DMA0_DAVALID [get_bd_pins axi_spdif_tx_0/DMA_REQ_DAVALID] [get_bd_pins processing_system7_1/DMA0_DAVALID]
   connect_bd_net -net processing_system7_1_DMA0_DRREADY [get_bd_pins axi_spdif_tx_0/DMA_REQ_DRREADY] [get_bd_pins processing_system7_1/DMA0_DRREADY]
-  connect_bd_net -net processing_system7_1_FCLK_CLK0 [get_bd_pins clk_wiz_1/clk_in1] [get_bd_pins processing_system7_1/FCLK_CLK0]
+  connect_bd_net -net processing_system7_1_FCLK_CLK0 [get_bd_pins clk_100mhz] [get_bd_pins axi4_gp0/ACLK] [get_bd_pins axi4_gp0/M00_ACLK] [get_bd_pins axi4_gp0/M01_ACLK] [get_bd_pins axi4_gp0/M02_ACLK] [get_bd_pins axi4_gp0/M03_ACLK] [get_bd_pins axi4_gp0/M04_ACLK] [get_bd_pins axi4_gp0/S00_ACLK] [get_bd_pins axi4_hp0/ACLK] [get_bd_pins axi4_hp0/M00_ACLK] [get_bd_pins axi4_hp0/S00_ACLK] [get_bd_pins axi4_hp0/S01_ACLK] [get_bd_pins axi_spdif_tx_0/DMA_REQ_ACLK] [get_bd_pins axi_spdif_tx_0/S_AXI_ACLK] [get_bd_pins proc_sys_reset_1/slowest_sync_clk] [get_bd_pins processing_system7_1/DMA0_ACLK] [get_bd_pins processing_system7_1/FCLK_CLK0] [get_bd_pins processing_system7_1/M_AXI_GP0_ACLK] [get_bd_pins processing_system7_1/S_AXI_HP0_ACLK]
+  connect_bd_net -net processing_system7_1_FCLK_CLK1 [get_bd_pins clk_200mhz] [get_bd_pins clk_wiz_0/clk_in1] [get_bd_pins processing_system7_1/FCLK_CLK1]
   connect_bd_net -net processing_system7_1_FCLK_RESET0_N [get_bd_pins proc_sys_reset_1/ext_reset_in] [get_bd_pins processing_system7_1/FCLK_RESET0_N]
   connect_bd_net -net xlconcat_0_dout [get_bd_pins processing_system7_1/IRQ_F2P] [get_bd_pins xlconcat_0/dout]
+  connect_bd_net -net xlconstant_gnd_0_const [get_bd_pins xlconcat_0/In1] [get_bd_pins xlconstant_gnd_0/const]
   
   # Restore current instance
   current_bd_instance $oldCurInst
@@ -249,15 +247,14 @@ proc create_hier_cell_Video_Display { parentCell nameHier } {
 
   # Create pins
   create_bd_pin -dir I -from 0 -to 0 axi_resetn
-  create_bd_pin -dir I -type clk clk_150mhz
-  create_bd_pin -dir I -type clk clk_75mhz
+  create_bd_pin -dir I -type clk clk_100mhz
+  create_bd_pin -dir I -type clk clk_200mhz
   create_bd_pin -dir O hdmi_int
   create_bd_pin -dir O hdmio_clk
   create_bd_pin -dir O -from 23 -to 0 hdmio_data
   create_bd_pin -dir O hdmio_de
   create_bd_pin -dir O hdmio_hsync
   create_bd_pin -dir O hdmio_vsync
-  create_bd_pin -dir I video_clk
 
   # Create instance: axi_clkgen_0, and set properties
   set axi_clkgen_0 [ create_bd_cell -type ip -vlnv kutu.com.au:kutu:axi_clkgen:1.0 axi_clkgen_0 ]
@@ -267,7 +264,7 @@ proc create_hier_cell_Video_Display { parentCell nameHier } {
 
   # Create instance: axi_iic_0, and set properties
   set axi_iic_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_iic:2.0 axi_iic_0 ]
-  set_property -dict [ list CONFIG.C_GPO_WIDTH {1}  ] $axi_iic_0
+  set_property -dict [ list CONFIG.C_GPO_WIDTH {1} CONFIG.IIC_FREQ_KHZ {100}  ] $axi_iic_0
 
   # Create instance: axi_vdma_0, and set properties
   set axi_vdma_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_vdma:6.1 axi_vdma_0 ]
@@ -296,10 +293,9 @@ proc create_hier_cell_Video_Display { parentCell nameHier } {
   connect_bd_net -net axi_resetn_1 [get_bd_pins axi_resetn] [get_bd_pins axi_clkgen_0/S_AXI_ARESETN] [get_bd_pins axi_hdmi_tx_36b_0/S_AXI_ARESETN] [get_bd_pins axi_iic_0/s_axi_aresetn] [get_bd_pins axi_vdma_0/axi_resetn]
   connect_bd_net -net axi_vdma_0_mm2s_frame_ptr_out [get_bd_pins axi_hdmi_tx_36b_0/vdma_fs_ret] [get_bd_pins axi_vdma_0/mm2s_frame_ptr_out]
   connect_bd_net -net axi_vdma_0_mm2s_introut [get_bd_pins hdmi_int] [get_bd_pins axi_vdma_0/mm2s_introut]
-  connect_bd_net -net clk_150mhz_1 [get_bd_pins clk_150mhz] [get_bd_pins axi_hdmi_tx_36b_0/vdma_clk] [get_bd_pins axi_vdma_0/m_axi_mm2s_aclk] [get_bd_pins axi_vdma_0/m_axis_mm2s_aclk]
-  connect_bd_net -net clk_75mhz_1 [get_bd_pins clk_75mhz] [get_bd_pins axi_clkgen_0/S_AXI_ACLK] [get_bd_pins axi_hdmi_tx_36b_0/S_AXI_ACLK] [get_bd_pins axi_iic_0/s_axi_aclk] [get_bd_pins axi_vdma_0/s_axi_lite_aclk]
+  connect_bd_net -net clk_200mhz_1 [get_bd_pins clk_200mhz] [get_bd_pins axi_clkgen_0/ref_clk]
+  connect_bd_net -net clk_75mhz_1 [get_bd_pins clk_100mhz] [get_bd_pins axi_clkgen_0/S_AXI_ACLK] [get_bd_pins axi_hdmi_tx_36b_0/S_AXI_ACLK] [get_bd_pins axi_hdmi_tx_36b_0/vdma_clk] [get_bd_pins axi_iic_0/s_axi_aclk] [get_bd_pins axi_vdma_0/m_axi_mm2s_aclk] [get_bd_pins axi_vdma_0/m_axis_mm2s_aclk] [get_bd_pins axi_vdma_0/s_axi_lite_aclk]
   connect_bd_net -net util_hdmi_tx_24b_0_hdmi_data_24 [get_bd_pins hdmio_data] [get_bd_pins util_hdmi_tx_24b_0/hdmi_data_24]
-  connect_bd_net -net video_clk_1 [get_bd_pins video_clk] [get_bd_pins axi_clkgen_0/ref_clk]
   
   # Restore current instance
   current_bd_instance $oldCurInst
@@ -341,15 +337,12 @@ proc create_root_design { parentCell } {
   set IIC [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:iic_rtl:1.0 IIC ]
 
   # Create ports
-  set FOS_int [ create_bd_port -dir I FOS_int ]
   set hdmio_clk [ create_bd_port -dir O hdmio_clk ]
   set hdmio_data [ create_bd_port -dir O -from 23 -to 0 hdmio_data ]
   set hdmio_de [ create_bd_port -dir O hdmio_de ]
   set hdmio_hsync [ create_bd_port -dir O hdmio_hsync ]
   set hdmio_vsync [ create_bd_port -dir O hdmio_vsync ]
   set spdif_tx [ create_bd_port -dir O spdif_tx ]
-  set video_clk [ create_bd_port -dir I -type clk video_clk ]
-  set_property -dict [ list CONFIG.FREQ_HZ {148500000}  ] $video_clk
 
   # Create instance: Video_Display
   create_hier_cell_Video_Display [current_bd_instance .] Video_Display
@@ -368,18 +361,16 @@ proc create_root_design { parentCell } {
   connect_bd_intf_net -intf_net s01_axi_1 [get_bd_intf_pins Video_Display/M_AXI_MM2S] [get_bd_intf_pins Zynq_1/S01_AXI]
 
   # Create port connections
-  connect_bd_net -net FOS_int_1 [get_bd_ports FOS_int] [get_bd_pins Zynq_1/FOS_int]
   connect_bd_net -net Video_Display_hdmi_int [get_bd_pins Video_Display/hdmi_int] [get_bd_pins Zynq_1/hdmi_int]
   connect_bd_net -net Zynq_1_spdif_tx_o [get_bd_ports spdif_tx] [get_bd_pins Zynq_1/spdif_tx_o]
-  connect_bd_net -net clk_150mhz [get_bd_pins Video_Display/clk_150mhz] [get_bd_pins Zynq_1/clk_150mhz]
-  connect_bd_net -net clk_75mhz [get_bd_pins Video_Display/clk_75mhz] [get_bd_pins Zynq_1/clk_75mhz]
+  connect_bd_net -net clk_100mhz [get_bd_pins Video_Display/clk_100mhz] [get_bd_pins Zynq_1/clk_100mhz]
+  connect_bd_net -net clk_200mhz [get_bd_pins Video_Display/clk_200mhz] [get_bd_pins Zynq_1/clk_200mhz]
   connect_bd_net -net logicvc_1_blank_o [get_bd_ports hdmio_de] [get_bd_pins Video_Display/hdmio_de]
   connect_bd_net -net logicvc_1_d_pix_o [get_bd_ports hdmio_data] [get_bd_pins Video_Display/hdmio_data]
   connect_bd_net -net logicvc_1_hsync_o [get_bd_ports hdmio_hsync] [get_bd_pins Video_Display/hdmio_hsync]
   connect_bd_net -net logicvc_1_pix_clk_o [get_bd_ports hdmio_clk] [get_bd_pins Video_Display/hdmio_clk]
   connect_bd_net -net logicvc_1_vsync_o [get_bd_ports hdmio_vsync] [get_bd_pins Video_Display/hdmio_vsync]
-  connect_bd_net -net proc_sys_reset_1_interconnect_aresetn [get_bd_pins Video_Display/axi_resetn] [get_bd_pins Zynq_1/interconnect_aresetn]
-  connect_bd_net -net video_clk_1 [get_bd_ports video_clk] [get_bd_pins Video_Display/video_clk]
+  connect_bd_net -net proc_sys_reset_1_interconnect_aresetn [get_bd_pins Video_Display/axi_resetn] [get_bd_pins Zynq_1/peripheral_aresetn]
 
   # Create address segments
   create_bd_addr_seg -range 0x40000000 -offset 0x0 [get_bd_addr_spaces Video_Display/axi_vdma_0/Data_MM2S] [get_bd_addr_segs Zynq_1/processing_system7_1/S_AXI_HP0/HP0_DDR_LOWOCM] SEG_processing_system7_1_HP0_DDR_LOWOCM

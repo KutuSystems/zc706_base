@@ -52,16 +52,11 @@ entity top_zc706 is
       hdmio_vsync       : out std_logic;
       iic_scl_io        : inout std_logic;
       iic_sda_io        : inout std_logic;
-      spdif_tx          : out std_logic;
-      video_clk_p       : in std_logic;
-      video_clk_n       : in std_logic
+      spdif_tx          : out std_logic
    );
 end top_zc706;
 
 architecture RTL of top_zc706 is
-
-   signal   fos_int : std_logic;
-   signal   video_clk : std_logic;
 
    component system_top_wrapper is
    port (
@@ -86,7 +81,6 @@ architecture RTL of top_zc706 is
       FIXED_IO_ps_clk   : inout std_logic;
       FIXED_IO_ps_porb  : inout std_logic;
       FIXED_IO_ps_srstb : inout std_logic;
-      FOS_int           : in std_logic;
       hdmio_clk         : out std_logic;
       hdmio_data        : out std_logic_vector ( 23 downto 0 );
       hdmio_de          : out std_logic;
@@ -94,17 +88,11 @@ architecture RTL of top_zc706 is
       hdmio_vsync       : out std_logic;
       iic_scl_io        : inout std_logic;
       iic_sda_io        : inout std_logic;
-      spdif_tx          : out std_logic;
-      video_clk         : in std_logic
+      spdif_tx          : out std_logic
   );
   end component;
 
 begin
-
-   fos_int <= '0';
-
-   -- input video clock
-   IBUFG_CLK   : IBUFGDS_LVDS_25 port map (I => video_clk_p, IB => video_clk_n, O => video_clk);
 
    system_top_wrapper_1 : system_top_wrapper
    port map (
@@ -129,7 +117,6 @@ begin
       FIXED_IO_ps_clk            => FIXED_IO_ps_clk,
       FIXED_IO_ps_porb           => FIXED_IO_ps_porb,
       FIXED_IO_ps_srstb          => FIXED_IO_ps_srstb,
-      FOS_int                    => fos_int,
       hdmio_clk                  => hdmio_clk,
       hdmio_data(23 downto 0)    => hdmio_data(23 downto 0),
       hdmio_de                   => hdmio_de,
@@ -137,8 +124,7 @@ begin
       hdmio_vsync                => hdmio_vsync,
       iic_scl_io                 => iic_scl_io,
       iic_sda_io                 => iic_sda_io,
-      spdif_tx                   => spdif_tx,
-      video_clk                  => video_clk
+      spdif_tx                   => spdif_tx
    );
 
 end RTL;
