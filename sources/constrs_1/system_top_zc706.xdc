@@ -51,6 +51,19 @@ set_switching_activity -static_probability 1 -signal_rate 0 [get_nets system_top
 # set_property PACKAGE_PIN AG14 [get_ports video_clk_n]
 # set_property IOSTANDARD LVDS_25 [get_ports video_clk_n]
 
+# GPIO leds on ZC706 
+set_property PACKAGE_PIN Y21 [get_ports gpio_led_left]
+set_property IOSTANDARD LVCMOS25 [get_ports gpio_led_left]
+
+set_property PACKAGE_PIN G2 [get_ports gpio_led_center]
+set_property IOSTANDARD LVCMOS15 [get_ports gpio_led_center]
+
+set_property PACKAGE_PIN W21 [get_ports gpio_led_right]
+set_property IOSTANDARD LVCMOS25 [get_ports gpio_led_right]
+
+set_property PACKAGE_PIN A17 [get_ports gpio_led_0]
+set_property IOSTANDARD LVCMOS15 [get_ports gpio_led_0]
+
 # AXI I2C on ZC706 
 set_property PACKAGE_PIN AJ18 [get_ports iic_sda_io]
 set_property IOSTANDARD LVCMOS25 [get_ports iic_sda_io]

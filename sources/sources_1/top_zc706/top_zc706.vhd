@@ -52,7 +52,11 @@ entity top_zc706 is
       hdmio_vsync       : out std_logic;
       iic_scl_io        : inout std_logic;
       iic_sda_io        : inout std_logic;
-      spdif_tx          : out std_logic
+      spdif_tx          : out std_logic;
+      gpio_led_left     : out std_logic;
+      gpio_led_center   : out std_logic;
+      gpio_led_right    : out std_logic;
+      gpio_led_0        : out std_logic
    );
 end top_zc706;
 
@@ -93,6 +97,11 @@ architecture RTL of top_zc706 is
   end component;
 
 begin
+
+   gpio_led_left     <= '1';
+   gpio_led_center   <= '0';
+   gpio_led_right    <= '1';
+   gpio_led_0        <= '0';
 
    system_top_wrapper_1 : system_top_wrapper
    port map (
