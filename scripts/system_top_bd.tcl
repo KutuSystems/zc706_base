@@ -145,7 +145,7 @@ proc create_hier_cell_Zynq_1 { parentCell nameHier } {
 
   # Create instance: axi4_hp0, and set properties
   set axi4_hp0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 axi4_hp0 ]
-  set_property -dict [ list CONFIG.ENABLE_ADVANCED_OPTIONS {1} CONFIG.M00_HAS_DATA_FIFO {2} CONFIG.M00_HAS_REGSLICE {1} CONFIG.NUM_MI {1} CONFIG.NUM_SI {1} CONFIG.S00_HAS_DATA_FIFO {2} CONFIG.S00_HAS_REGSLICE {1} CONFIG.S01_HAS_DATA_FIFO {2} CONFIG.S01_HAS_REGSLICE {1} CONFIG.STRATEGY {0}  ] $axi4_hp0
+  set_property -dict [ list CONFIG.ENABLE_ADVANCED_OPTIONS {0} CONFIG.M00_HAS_DATA_FIFO {2} CONFIG.M00_HAS_REGSLICE {1} CONFIG.NUM_MI {1} CONFIG.NUM_SI {1} CONFIG.S00_HAS_DATA_FIFO {0} CONFIG.S00_HAS_REGSLICE {0} CONFIG.S01_HAS_DATA_FIFO {2} CONFIG.S01_HAS_REGSLICE {1} CONFIG.STRATEGY {0}  ] $axi4_hp0
 
   # Create instance: axi_spdif_tx_0, and set properties
   set axi_spdif_tx_0 [ create_bd_cell -type ip -vlnv kutu.com.au:kutu:axi_spdif_tx:1.0 axi_spdif_tx_0 ]
@@ -170,7 +170,7 @@ proc create_hier_cell_Zynq_1 { parentCell nameHier } {
   set_property -dict [ list CONFIG.CONST_VAL {0}  ] $xlconstant_gnd_0
 
   # Create interface connections
-  connect_bd_intf_net -intf_net S00_AXI_2 [get_bd_intf_pins S00_AXI] [get_bd_intf_pins axi4_hp0/S00_AXI]
+  connect_bd_intf_net -intf_net S01_AXI_1 [get_bd_intf_pins S00_AXI] [get_bd_intf_pins axi4_hp0/S00_AXI]
   connect_bd_intf_net -intf_net axi4_gp0_M00_AXI [get_bd_intf_pins M00_AXI] [get_bd_intf_pins axi4_gp0/M00_AXI]
   connect_bd_intf_net -intf_net axi4_gp0_M01_AXI [get_bd_intf_pins M01_AXI] [get_bd_intf_pins axi4_gp0/M01_AXI]
   connect_bd_intf_net -intf_net axi4_gp0_M02_AXI [get_bd_intf_pins axi4_gp0/M02_AXI] [get_bd_intf_pins axi_spdif_tx_0/S_AXI]
@@ -288,9 +288,8 @@ proc create_hier_cell_Video_Display { parentCell nameHier } {
   connect_bd_net -net axi_hdmi_tx_36b_0_hdmi_data_e [get_bd_pins hdmio_de] [get_bd_pins axi_hdmi_tx_36b_0/hdmi_data_e]
   connect_bd_net -net axi_hdmi_tx_36b_0_hdmi_hsync [get_bd_pins hdmio_hsync] [get_bd_pins axi_hdmi_tx_36b_0/hdmi_hsync]
   connect_bd_net -net axi_hdmi_tx_36b_0_hdmi_vsync [get_bd_pins hdmio_vsync] [get_bd_pins axi_hdmi_tx_36b_0/hdmi_vsync]
-  connect_bd_net -net axi_hdmi_tx_36b_0_vdma_fs [get_bd_pins axi_hdmi_tx_36b_0/vdma_fs] [get_bd_pins axi_vdma_0/mm2s_fsync]
+  connect_bd_net -net axi_hdmi_tx_36b_0_vdma_fs [get_bd_pins axi_hdmi_tx_36b_0/vdma_fs] [get_bd_pins axi_hdmi_tx_36b_0/vdma_fs_ret] [get_bd_pins axi_vdma_0/mm2s_fsync]
   connect_bd_net -net axi_resetn_1 [get_bd_pins axi_resetn] [get_bd_pins axi_clkgen_0/S_AXI_ARESETN] [get_bd_pins axi_hdmi_tx_36b_0/S_AXI_ARESETN] [get_bd_pins axi_iic_0/s_axi_aresetn] [get_bd_pins axi_vdma_0/axi_resetn]
-  connect_bd_net -net axi_vdma_0_mm2s_frame_ptr_out [get_bd_pins axi_hdmi_tx_36b_0/vdma_fs_ret] [get_bd_pins axi_vdma_0/mm2s_frame_ptr_out]
   connect_bd_net -net axi_vdma_0_mm2s_introut [get_bd_pins hdmi_int] [get_bd_pins axi_vdma_0/mm2s_introut]
   connect_bd_net -net clk_200mhz_1 [get_bd_pins clk_200mhz] [get_bd_pins axi_clkgen_0/ref_clk]
   connect_bd_net -net clk_75mhz_1 [get_bd_pins clk_100mhz] [get_bd_pins axi_clkgen_0/S_AXI_ACLK] [get_bd_pins axi_hdmi_tx_36b_0/S_AXI_ACLK] [get_bd_pins axi_hdmi_tx_36b_0/vdma_clk] [get_bd_pins axi_iic_0/s_axi_aclk] [get_bd_pins axi_vdma_0/m_axi_mm2s_aclk] [get_bd_pins axi_vdma_0/m_axis_mm2s_aclk] [get_bd_pins axi_vdma_0/s_axi_lite_aclk]

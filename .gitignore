@@ -7,4 +7,9 @@ xgui
 *.runs
 *.srcs
 *.sdk
+*.str
+*.swp
+*.elf
+*.bit
+*.bin
 .Xil
