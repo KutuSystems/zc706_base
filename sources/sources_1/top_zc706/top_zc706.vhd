@@ -92,16 +92,58 @@ architecture RTL of top_zc706 is
       hdmio_vsync       : out std_logic;
       iic_scl_io        : inout std_logic;
       iic_sda_io        : inout std_logic;
-      spdif_tx          : out std_logic
-  );
-  end component;
+      spdif_tx          : out std_logic;
+      sys_resetn        : out std_logic_vector ( 0 to 0 );
+      sys_clk           : out std_logic;
+      sys_rd_cmd        : out std_logic;
+      sys_rd_endcmd     : in  std_logic;
+      sys_rdaddr        : out std_logic_vector ( 12 downto 2 );
+      sys_rddata        : in  std_logic_vector ( 31 downto 0 );
+      sys_wr_cmd        : out std_logic;
+      sys_wraddr        : out std_logic_vector ( 12 downto 2 );
+      sys_wrdata        : out std_logic_vector ( 31 downto 0 )
+   );
+   end component;
+
+   component axi4_lite_test
+   port (
+      resetn               : in std_logic;
+      clk                  : in std_logic; 
+
+      -- write interface from system
+      sys_wraddr           : in std_logic_vector(12 downto 2);                      -- address for reads/writes
+      sys_wrdata           : in std_logic_vector(31 downto 0);                      -- data/no. bytes
+      sys_wr_cmd           : in std_logic;                                          -- write strobe
+
+      sys_rdaddr           : in std_logic_vector(12 downto 2);                      -- address for reads/writes
+      sys_rddata           : out std_logic_vector(31 downto 0);                     -- input data port for read operation
+      sys_rd_cmd           : in std_logic;                                          -- read strobe
+      sys_rd_endcmd        : out std_logic;                                         -- input read strobe
+
+      -- led output
+      gpio_led             : out std_logic_vector(3 downto 0)
+   );
+   end component;
+
+   signal sys_resetn       : std_logic_vector(0 downto 0);         
+   signal sys_clk          : std_logic;                                          -- system clk (same as AXI clock
+   signal sys_wraddr       : std_logic_vector(12 downto 2);                      -- address for reads/writes
+   signal sys_wrdata       : std_logic_vector(31 downto 0);                      -- data/no. bytes
+   signal sys_wr_cmd       : std_logic;                                          -- write strobe
+
+   signal sys_rdaddr       : std_logic_vector(12 downto 2);                      -- address for reads/writes
+   signal sys_rddata       : std_logic_vector(31 downto 0);                      -- input data port for read operation
+   signal sys_rd_cmd       : std_logic;                                          -- read strobe
+   signal sys_rd_endcmd    : std_logic;                                          -- input read strobe
+
+   signal gpio_led         : std_logic_vector(3 downto 0); 
 
 begin
 
-   gpio_led_left     <= '1';
-   gpio_led_center   <= '0';
-   gpio_led_right    <= '1';
-   gpio_led_0        <= '0';
+   gpio_led_left     <= gpio_led(3);
+   gpio_led_center   <= gpio_led(2);
+   gpio_led_right    <= gpio_led(1);
+   gpio_led_0        <= gpio_led(0);
 
    system_top_wrapper_1 : system_top_wrapper
    port map (
@@ -133,7 +175,35 @@ begin
       hdmio_vsync                => hdmio_vsync,
       iic_scl_io                 => iic_scl_io,
       iic_sda_io                 => iic_sda_io,
-      spdif_tx                   => spdif_tx
+      spdif_tx                   => spdif_tx,
+      sys_resetn                 => sys_resetn,
+      sys_clk                    => sys_clk,
+      sys_rd_cmd                 => sys_rd_cmd,       -- read strobe
+      sys_rd_endcmd              => sys_rd_endcmd,    -- input read strobe
+      sys_rdaddr                 => sys_rdaddr,       -- address for reads/writes
+      sys_rddata                 => sys_rddata,       -- input data port for read operation
+      sys_wr_cmd                 => sys_wr_cmd,       -- write strobe
+      sys_wraddr                 => sys_wraddr,       -- address for reads/writes
+      sys_wrdata                 => sys_wrdata        -- data/no. bytes
    );
 
+   UUT_test : axi4_lite_test
+   port map (
+      resetn               => sys_resetn(0),
+      clk                  => sys_clk,                -- system clk (same as AXI clock
+
+      -- write interface from system
+      sys_wraddr           => sys_wraddr,             -- address for reads/writes
+      sys_wrdata           => sys_wrdata,             -- data/no. bytes
+      sys_wr_cmd           => sys_wr_cmd,             -- write strobe
+
+      sys_rdaddr           => sys_rdaddr,             -- address for reads/writes
+      sys_rddata           => sys_rddata,             -- input data port for read operation
+      sys_rd_cmd           => sys_rd_cmd,             -- read strobe
+      sys_rd_endcmd        => sys_rd_endcmd,          -- input read strobe
+
+      -- led output
+      gpio_led             => gpio_led
+   );
+   
 end RTL;

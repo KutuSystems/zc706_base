@@ -52,20 +52,26 @@
 
 		intc@f8f01000 {
 			interrupt-controller;
-			compatible = "arm,cortex-a9-gic";
-			#interrupt-cells = <0x3>;
-			reg = <0xf8f01000 0x1000 0xf8f00100 0x100>;
+			#address-cells = <2>;
+			#interrupt-cells = <3>;
+			#size-cells = <1>;
+			compatible = "xlnx,ps7-scugic-1.00.a", "arm,cortex-a9-gic", "arm,gic";
+			num_cpus = <2>;
+			num_interrupts = <96>;
+			reg = <0xf8f01000 0x1000>, <0xf8f00100 0x100>;
 			linux,phandle = <0x1>;
 			phandle = <0x1>;
 		};
 
 		pl310@f8f02000 {
-			compatible = "arm,pl310-cache";
-			cache-unified;
-			cache-level = <0x2>;
+			arm,data-latency = <3 2 2>;
+			arm,tag-latency = <2 2 2>;
+			cache-level = <2>;
+			cache-unified ;
+			compatible = "xlnx,ps7-pl310-1.00.a", "arm,pl310-cache";
+			interrupt-parent = <0x1>;
+			interrupts = <0 2 4>;
 			reg = <0xf8f02000 0x1000>;
-			arm,data-latency = <0x3 0x2 0x2>;
-			arm,tag-latency = <0x2 0x2 0x2>;
 		};
 
 		uart@e0001000 {
@@ -84,7 +90,7 @@
 			#dma-cells = <0x1>;
 			#dma-channels = <0x8>;
 			#dma-requests = <0x4>;
-			compatible = "arm,primecell", "arm,pl330";
+			compatible = "xlnx,ps7-dma-1.00.a", "arm,primecell", "arm,pl330";
 			interrupt-parent = <0x1>;
 			interrupts = <0x0 0xd 0x4 0x0 0xe 0x4 0x0 0xf 0x4 0x0 0x10 0x4 0x0 0x11 0x4 0x0 0x28 0x4 0x0 0x29 0x4 0x0 0x2a 0x4 0x0 0x2b 0x4>;
 			reg = <0xf8003000 0x1000>;
@@ -124,7 +130,7 @@
 		};
 
 		timer@f8f00600 {
-			compatible = "arm,cortex-a9-twd-timer";
+			compatible = "xlnx,ps7-scutimer-1.00.a", "arm,cortex-a9-twd-timer";
 			reg = <0xf8f00600 0x20>;
 			interrupts = <0x1 0xd 0x301>;
 			clocks = <0x2 0x4>;
@@ -133,9 +139,9 @@
 
 		swdt@f8005000 {
 			device_type = "watchdog";
-			compatible = "xlnx,ps7-wdt-1.00.a";
-			reg = <0xf8005000 0x100>;
-			interrupts = <0x0 0x9 0x4>;
+			compatible = "xlnx,ps7-wdt-1.00.a", "xlnx,zynq-wdt-1.00.a";
+			reg = <0xf8005000 0x1000>;
+			interrupts = <0x0 0x9 0x1>;
 			interrupt-parent = <0x1>;
 			clocks = <0x2 0x2d>;
 			reset = <0x0>;
@@ -144,9 +150,11 @@
 
 		scuwdt@f8f00620 {
 			device_type = "watchdog";
-			compatible = "arm,mpcore_wdt";
-			reg = <0xf8f00620 0x20>;
+			compatible = "xlnx,ps7-scuwdt-1.00.a";
+			reg = <0xf8f00620 0xe0>;
 			clocks = <0x2 0x4>;
+			interrupt-parent = <0x1>;
+			interrupts = <1 14 0x301>;
 			reset = <0x1>;
 		};
 
@@ -159,6 +167,7 @@
 			#size-cells = <0x0>;
 			clock-names = "ref_clk", "aper_clk";
 			clocks = <0x2 0xd 0x2 0x1e>;
+			enet-reset = <0x4 47 0>;
 			xlnx,enet-clk-freq-hz = <0x17d7840>;
 			xlnx,enet-reset = "MIO 11";
 			xlnx,enet-slcr-1000mbps-div0 = <0x8>;
@@ -183,15 +192,16 @@
 		};
 
 		gpio@e000a000 {
-			compatible = "xlnx,ps7-gpio-1.00.a";
-			reg = <0xe000a000 0x1000>;
-			interrupts = <0x0 0x14 0x4>;
-			interrupt-parent = <0x1>;
-			clocks = <0x2 0x2a>;
+			#gpio-cells = <2>;
+			clocks = <0x2 42>;
+			compatible = "xlnx,ps7-gpio-1.00.a", "xlnx,zynq-gpio-1.00.a";
+			emio-gpio-width = <64>;
 			gpio-controller;
-			#gpio-cells = <0x2>;
-			linux,phandle = <0x4>;
-			phandle = <0x4>;
+			gpio-mask-high = <0x0>;
+			gpio-mask-low = <0x0>;
+			interrupt-parent = <0x1>;
+			interrupts = <0 20 4>;
+			reg = <0xe000a000 0x1000>;
 		};
 
 		sdhci@e0100000 {
@@ -293,76 +303,11 @@
 			compatible = "xlnx,ps7-ocm";
 			reg = <0xfffc0000 0x40000>;
 		};
-	};
 
-	memory {
-		device_type = "memory";
-		reg = <0x0 0x40000000>;
-	};
-
-	chosen {
-		bootargs = "console=ttyPS0,115200 root=/dev/mmcblk0p2 rw earlyprintk rootfstype=ext4 rootwait devtmpfs.mount=0";
-		linux,stdout-path = "/amba@0/uart@E0001000";
-	};
-
-	leds {
-		compatible = "gpio-leds";
-
-		ds8 {
-			label = "ds12:green";
-			gpios = <0x4 0x3d 0x0>;
-		};
-
-		ds9 {
-			label = "ds15:green";
-			gpios = <0x4 0x3e 0x0>;
-		};
-
-		ds10 {
-			label = "ds16:green";
-			gpios = <0x4 0x3f 0x0>;
-		};
-
-		ds35 {
-			label = "ds17:green";
-			gpios = <0x4 0x40 0x0>;
-		};
-	};
-
-	gpio_keys {
-		compatible = "gpio-keys";
-		#address-cells = <0x1>;
-		#size-cells = <0x0>;
-		autorepeat;
-
-		sw7 {
-			label = "Left";
-			linux,code = <0x69>;
-			gpios = <0x4 0x3a 0x0>;
-		};
-
-		sw8 {
-			label = "Right";
-			linux,code = <0x6a>;
-			gpios = <0x4 0x3c 0x0>;
-		};
-
-		sw9 {
-			label = "Select";
-			linux,code = <0x1c>;
-			gpios = <0x4 0x3b 0x0>;
-		};
-	};
-
-	fpag-axi@0 {
-		compatible = "simple-bus";
-		#address-cells = <0x1>;
-		#size-cells = <0x1>;
-		ranges;
-
-		i2c@e0004000 {
+		ps7-i2c@e0004000 {
 			compatible = "xlnx,ps7-i2c-1.00.a";
 			i2c-clk = <100000>;
+			i2c-reset = <0x4 46 0>;
 			interrupt-parent = <0x1>;
 			interrupts = <0 25 4>;
 			reg = <0xe0004000 0x1000>;
@@ -383,11 +328,13 @@
 					#size-cells = <0x0>;
 					reg = <0x0>;
 
-					osc@5d {
-						compatible = "si570";
+					si570: clock-generator@5d {
+						#clock-cells = <0>;
+						compatible = "silabs,si570";
+						temperature-stability = <50>;
 						reg = <0x5d>;
-						factory-fout = <0x9502f90>;
-						initial-fout = <0x8d9ee20>;
+						factory-fout = <156250000>;
+						clock-frequency = <148500000>;
 					};
 				};
 
@@ -444,13 +391,41 @@
 					#size-cells = <0x0>;
 					reg = <0x4>;
 
-					rtc@54 {
+					rtc@51 {
 						compatible = "nxp,pcf8563";
 						reg = <0x51>;
 					};
 				};
+
+				i2c@7 {
+					#address-cells = <1>;
+					#size-cells = <0>;
+					reg = <7>;
+					ucd90120@65 {
+						compatible = "pmbus,ucd90120";
+						reg = <0x65>;
+					};
+				};
 			};
 		};
+
+	};
+
+	memory {
+		device_type = "memory";
+		reg = <0x0 0x40000000>;
+	};
+
+	chosen {
+		bootargs = "console=ttyPS0,115200 root=/dev/mmcblk0p2 rw earlyprintk rootfstype=ext4 rootwait devtmpfs.mount=0";
+		linux,stdout-path = "/amba@0/uart@E0001000";
+	};
+
+	fpag-axi@0 {
+		compatible = "simple-bus";
+		#address-cells = <0x1>;
+		#size-cells = <0x1>;
+		ranges;
 
 		axivdma@43000000 {
 			#address-cells = <0x1>;
@@ -476,7 +451,7 @@
 			compatible = "adi,axi-clkgen-2.00.a";
 			reg = <0x79000000 0x10000>;
 			#clock-cells = <0x0>;
-			clocks = <0x2 0x11>;
+			clocks = <0x2 16>;
 			linux,phandle = <0x7>;
 			phandle = <0x7>;
 		};
