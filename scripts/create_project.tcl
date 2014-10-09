@@ -20,23 +20,12 @@ if {[string equal [get_filesets sources_1] ""]} {
 }
 
 # Add files to 'sources_1' fileset
-set obj [get_filesets sources_1]
-set files [list \
- "[file normalize "$orig_proj_dir/sources/sources_1/top_zc706/top_zc706.vhd"]"\
-]
-add_files -norecurse -fileset $obj $files
-
-# Set 'sources_1' fileset file properties for remote files
-# None
-
-# Set 'sources_1' fileset file properties for local files
-set file "top_zc706/top_zc706.vhd"
-set file_obj [get_files -of_objects sources_1 [list "*$file"]]
-set_property "file_type" "VHDL" $file_obj
-
+add_files -norecurse sources/sources_1/top_zc706/top_zc706.vhd
+add_files -norecurse sources/sources_1/test/axi4_lite_test.vhd
 
 # Set 'sources_1' fileset properties
 set obj [get_filesets sources_1]
+set_property "ip_repo_paths" "../XilinxIP" $obj
 set_property "top" "top_zc706" $obj
 
 # Create 'constrs_1' fileset (if not found)
@@ -45,19 +34,7 @@ if {[string equal [get_filesets constrs_1] ""]} {
 }
 
 # Add files to 'constrs_1' fileset
-set obj [get_filesets constrs_1]
-set files [list \
- "[file normalize "$orig_proj_dir/sources/constrs_1/system_top_zc706.xdc"]"\
-]
-add_files -norecurse -fileset $obj $files
-
-# Set 'constrs_1' fileset file properties for remote files
-# None
-
-# Set 'constrs_1' fileset file properties for local files
-set file "constrs_1/system_top_zc706.xdc"
-set file_obj [get_files -of_objects constrs_1 [list "*$file"]]
-set_property "file_type" "XDC" $file_obj
+add_files -fileset constrs_1 -norecurse sources/constrs_1/system_top_zc706.xdc
 
 
 # Set 'constrs_1' fileset properties

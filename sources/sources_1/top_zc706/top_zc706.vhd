@@ -50,8 +50,6 @@ entity top_zc706 is
       hdmio_de          : out std_logic;
       hdmio_hsync       : out std_logic;
       hdmio_vsync       : out std_logic;
-      iic_scl_io        : inout std_logic;
-      iic_sda_io        : inout std_logic;
       spdif_tx          : out std_logic;
       gpio_led_left     : out std_logic;
       gpio_led_center   : out std_logic;
@@ -90,8 +88,6 @@ architecture RTL of top_zc706 is
       hdmio_de          : out std_logic;
       hdmio_hsync       : out std_logic;
       hdmio_vsync       : out std_logic;
-      iic_scl_io        : inout std_logic;
-      iic_sda_io        : inout std_logic;
       spdif_tx          : out std_logic;
       sys_resetn        : out std_logic_vector ( 0 to 0 );
       sys_clk           : out std_logic;
@@ -127,11 +123,11 @@ architecture RTL of top_zc706 is
 
    signal sys_resetn       : std_logic_vector(0 downto 0);         
    signal sys_clk          : std_logic;                                          -- system clk (same as AXI clock
-   signal sys_wraddr       : std_logic_vector(12 downto 2);                      -- address for reads/writes
+   signal sys_wraddr       : std_logic_vector(13 downto 2);                      -- address for reads/writes
    signal sys_wrdata       : std_logic_vector(31 downto 0);                      -- data/no. bytes
    signal sys_wr_cmd       : std_logic;                                          -- write strobe
 
-   signal sys_rdaddr       : std_logic_vector(12 downto 2);                      -- address for reads/writes
+   signal sys_rdaddr       : std_logic_vector(13 downto 2);                      -- address for reads/writes
    signal sys_rddata       : std_logic_vector(31 downto 0);                      -- input data port for read operation
    signal sys_rd_cmd       : std_logic;                                          -- read strobe
    signal sys_rd_endcmd    : std_logic;                                          -- input read strobe
@@ -173,8 +169,6 @@ begin
       hdmio_de                   => hdmio_de,
       hdmio_hsync                => hdmio_hsync,
       hdmio_vsync                => hdmio_vsync,
-      iic_scl_io                 => iic_scl_io,
-      iic_sda_io                 => iic_sda_io,
       spdif_tx                   => spdif_tx,
       sys_resetn                 => sys_resetn,
       sys_clk                    => sys_clk,

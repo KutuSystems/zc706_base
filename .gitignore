@@ -6,6 +6,7 @@ component.xml
 xgui
 *.runs
 *.srcs
+*.cache
 *.sdk
 *.str
 *.swp
